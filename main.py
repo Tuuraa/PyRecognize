@@ -1,4 +1,4 @@
-from models import Recorder, RecorderConfig
+from Models.recorder import Recorder, RecorderConfig
 from config import Model_path
 
 
