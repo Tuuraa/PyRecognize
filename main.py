@@ -1,11 +1,13 @@
+import asyncio
+
 from Models.recorder import Recorder, RecorderConfig
-from config import Model_path
+from config import config
 
 
-def main():
-    recorder = Recorder(record_config=RecorderConfig(Model_path))
-    recorder.run()
+async def main():
+    recorder = Recorder(record_config=RecorderConfig(config.sky_model_path))
+    await recorder.run()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

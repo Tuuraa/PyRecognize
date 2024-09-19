@@ -1,16 +1,10 @@
 import pvporcupine
-import logging
+import logging, time
 
 from pvrecorder import PvRecorder
-from config import PicovoiceAccessKey
+from SpeechRec.speech_recognize import VoskModel
+from config import config
 
-'''
-    Настройка доп логов для файла
-'''
-
-#file_handler = logging.FileHandler('log_file.log')
-#formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#file_handler.setFormatter(formatter)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,22 +12,16 @@ logger = logging.getLogger(__name__)
 
 class RecorderConfig:
     def __init__(self, keyword_paths=None) -> None:
-        
-        '''
-            self.keywords - Все wake word слова от Picovoice
-            keyword_paths = Путь до файла с моделью Hey Sky
-        '''
-
         self.keywords = [word for word in pvporcupine.KEYWORDS] 
 
         if keyword_paths:
             self.porcupine = pvporcupine.create(
-                access_key=PicovoiceAccessKey, 
+                access_key=config.picovoice_access_key, 
                 keyword_paths=[keyword_paths]
             )
         else:
             self.porcupine = pvporcupine.create(
-                access_key=PicovoiceAccessKey,
+                access_key=config.picovoice_access_key,
                 keywords=self.keywords
             )
 
@@ -42,7 +30,7 @@ class RecorderConfig:
             frame_length=self.porcupine.frame_length
         )
         self.porcupine = pvporcupine.create(
-            access_key=PicovoiceAccessKey, 
+            access_key=config.picovoice_access_key, 
             keyword_paths=[keyword_paths]
         )
 
@@ -59,25 +47,30 @@ class Recorder:
         self.recorder = self.record_config.recoder
         self.porcupine = self.record_config.porcupine
 
-    def start_recording(self):
+        self.vosk_model = VoskModel(config.vosk_small_model_path)
+
+    async def start_recording(self):
         self.recorder.start()
         logger.info("Start listening...")
         while True:
             audio_frame = self.recorder.read()
             keyword_index = self.porcupine.process(audio_frame)
             if keyword_index >= 0:
-                self.process()
+                await self.process()
 
     def stop_and_cleanup(self):
         self.recorder.stop()
         self.porcupine.delete()
         self.recorder.delete()
 
-    def run(self):
+    async def run(self):
         try:
-            self.start_recording()
+            await self.start_recording()
         except KeyboardInterrupt:
             self.stop_and_cleanup()
 
-    def process(self):
-        logger.info("DETECTED")
+    async def process(self):
+        logger.info("im listening...")
+        
+        result = await self.vosk_model.run()
+        print(result)
