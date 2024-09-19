@@ -2,7 +2,7 @@ import pvporcupine
 import logging, time
 
 from pvrecorder import PvRecorder
-from SpeechRec.speech_recognize import VoskModel
+from Models.speech_recognize import VoskModel
 from config import config
 
 
