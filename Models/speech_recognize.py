@@ -42,6 +42,7 @@ class VoskModel:
             data = self.stream.read(400, exception_on_overflow=False)
             if data and self.rec.AcceptWaveform(data):
                 partial_result = self.rec.PartialResult()
+                
                 if partial_result:
                     yield partial_result
             time.sleep(0.1)
