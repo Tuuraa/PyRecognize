@@ -14,6 +14,7 @@ class VoskModel:
         self.model = Model(model_path)
         self.rec = KaldiRecognizer(self.model, 16000)
         self.p_audio = pyaudio.PyAudio()
+        
         self.stream = self.p_audio.open(
             format=pyaudio.paInt16,
             channels=1,
@@ -23,7 +24,7 @@ class VoskModel:
         )
 
 
-    def _listen_normal_mode(self) -> str:
+    def listen_normal_mode(self) -> str:
         self.stream.start_stream()
 
         while True:
@@ -55,11 +56,5 @@ class VoskModel:
     '''
         Пока что только полный режим прослушивания
     '''
-    async def run(self, listen_mode='normal'):
-        # if listen_mode == 'partial':
-        #     for text in self.listen_partial_mode():
-        #         yield text
-        # else:
-            return self._listen_normal_mode()
-            # for text in self._listen_normal_mode():
-            #     return text
+    async def run(self):
+        return self.listen_normal_mode()
